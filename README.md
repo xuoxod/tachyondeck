@@ -129,3 +129,36 @@ npx expo start
 
 - **No naked merges:** `npm test` requires 100% green coverage against structural crashes and edge-cases before committing.
 - **Lower case only:** This repository and all references are exclusively normalized to `tachyondeck`.
+
+## Real-World Scenarios & Setup Guides
+
+The true power of the `tachyonflux`/`tachyondeck` ecosystem lies in its ability to securely bridge your mobile device to private networks without port forwarding, VPNs, or exposing public interfaces. 
+
+### Scenario 1: The Remote Webcam / Local Network Bridge (Zero-Trust Edge)
+**The Problem:** You have standard IP network cameras (or IoT devices) on your home Wi-Fi. You want to view their feeds or administrative consoles from your phone while traveling, but you refuse to open ports on your home router or expose the cameras to the public internet.
+**The Solution:** 
+1. **Setup `tachyonflux`:** Install and run the `tachyonflux` agent on a Raspberry Pi, Mac, or Windows desktop that is connected to the same home LAN as your webcams.
+2. **Setup `tachyondeck`:** Open the `tachyondeck` mobile app on your phone and authenticate.
+3. **The Workflow:** 
+    * `tachyonflux` establishes a secure outbound signaling connection to the `rmediatech` signaling server.
+    * When you open `tachyondeck`, it signals the `flux` node and establishes an end-to-end encrypted WebRTC DataChannel directly to your home machine.
+    * From the mobile app, you send a proxied HTTP GET request to the camera's local IP (e.g., `http://192.168.1.50:80`).
+    * `tachyonflux` executes the local network request on your behalf and pipes the MJPEG stream or administrative HTML console back through the encrypted DataChannel to your phone screen. Your home network remains completely locked down from the outside.
+
+### Scenario 2: Secure Smart Home / Home Assistant Integration
+**The Problem:** You run Home Assistant or local smart home hubs but don't want to expose your internal `8123` port to the web, risking a critical network breach.
+**The Solution:**
+1. **Setup `tachyonflux`:** Run `tachyonflux` as a background service on the same machine or network hosting Home Assistant.
+2. **Setup `tachyondeck`:** Configure custom macro buttons in your `tachyondeck` app interface.
+3. **The Workflow:** 
+    * Pressing a button on your phone sends a pre-configured JSON payload through the WebRTC tunnel directly to the `flux` node.
+    * `tachyonflux` translates this into an internal `POST http://127.0.0.1:8123/api/...` to trigger your smart home automations securely, acting as an internal, authenticated API proxy.
+
+### Scenario 3: Remote Server Script Execution & Jumpbox Management
+**The Problem:** You manage a fleet of remote Linux servers (or a cloud VPC) and occasionally need to restart services, check system health, or tail logs while away from your laptop. SSH clients on mobile are notoriously clunky.
+**The Solution:**
+1. **Setup `tachyonflux`:** Deploy `tachyonflux` inside the VPC alongside your critical infrastructure as a lightweight service.
+2. **Setup `tachyondeck`:** Use the mobile UI's terminal execution or custom command features.
+3. **The Workflow:** 
+    * `tachyonflux` acts as a secure, authenticated, programmatic jumpbox.
+    * Using `tachyondeck`, you can execute quick diagnostic commands like `tail -n 50 /var/log/syslog` or `docker restart web_container`. The `flux` node runs the command locally and streams the standard output directly to your phone. It functionally replaces the need to fumble with mobile SSH keys for rapid triage incidents.

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TachyonDeck",
-    "slug": "TachyonDeck",
+    "name": "tachyondeck",
+    "slug": "tachyondeck",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

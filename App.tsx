@@ -22,7 +22,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>TachyonDeck</Text>
+        <Text style={styles.title}>tachyondeck</Text>
         <View style={styles.statusContainer}>
           <Text style={[styles.statusText, isConnected ? styles.connected : styles.disconnected]}>
             {isConnected ? 'ONLINE' : 'OFFLINE'}
@@ -30,9 +30,9 @@ export default function App() {
           {!isConnected && <ActivityIndicator size="small" color="#ff4444" style={styles.loader} />}
         </View>
       </View>
-      <Terminal 
-        output={output} 
-        onCommandSubmit={sendCommand} 
+      <Terminal
+        output={output}
+        onCommandSubmit={sendCommand}
       />
     </View>
   );

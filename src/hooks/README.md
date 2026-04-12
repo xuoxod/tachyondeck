@@ -1,17 +1,19 @@
 # 🎣 `src/hooks` | Logic Connectors
 
-This module integrates non-React backend operations from `src/services/` into functional hooks usable directly by `src/components/` and `src/screens/`. 
+This module integrates non-React backend operations from `src/services/` into functional hooks usable directly by `src/components/` and `src/screens/`.
 
-### 🏛️ Philosophy
+## 🏛️ Philosophy
 
 Hooks must isolate state management (like tracking an array of logs via `useState` and processing message bursts via `useEffect`) away from the UI layers. Services fire raw network events; your hook maps those to actionable UI variables (`output`, `isConnected`).
 
 ### 📖 Available Hooks
 
 #### `useTachyon.ts`
+
 The primary hook that spins up a `SignalingService`, attaches its event loops (`connectionStateChange`, `message`), and caches incoming terminal traces into string arrays suitable for a `<Terminal />` `FlatList`.
 
 **Core Return Pattern:**
+
 ```tsx
 import { useTachyon } from '../hooks/useTachyon';
 

@@ -1,0 +1,20 @@
+
+        var profile *models.UserProfile
+        claims, err := auth.ValidateToken(r)
+        if err == nil {
+                dbUser, dbErr := store.Users.GetByEmail(r.Context(), claims.UserID)
+                if dbErr == nil {
+                        user = dbUser
+                        dbProfile, _ := store.Users.GetUserProfile(r.Context(), dbUser.ID)
+                        profile = dbProfile
+                        isAuthenticated = true
+                }
+        }
+
+        data := map[string]interface{}{
+                "title":            "Tachyon Ecosystem",
+                "description":      "Download TachyonDeck for mobile or TachyonFlux for your edge nodes.",
+                "is_authenticated": isAuthenticated,
+                "current_user":     user,
+                "current_profile":  profile,
+

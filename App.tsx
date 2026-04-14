@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import React, { useEffect, useCallback } from 'react';
+import { View, StyleSheet, Text, ActivityIndicator, TouchableOpacity, BackHandler } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Terminal } from './src/components/Terminal';
 import { useTachyon } from './src/hooks/useTachyon';
 
-const TACHYONFLUX_WS_URL = 'wss://sfu.rmediatech.com/ws'; // Connect to the global signaling backbone
+const TACHYONFLUX_WS_URL = 'https://rmediatech.com/api/signal/tachyon'; // Connect to the global signaling backbone
 
 export default function App() {
   const {
@@ -20,6 +20,13 @@ export default function App() {
     return () => disconnect();
   }, [connect, disconnect]);
 
+  const handleExit = useCallback(() => {
+    disconnect();
+    setTimeout(() => {
+      BackHandler.exitApp();
+    }, 150);
+  }, [disconnect]);
+
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
@@ -30,6 +37,9 @@ export default function App() {
               {isConnected ? 'ONLINE' : 'OFFLINE'}
             </Text>
             {!isConnected && <ActivityIndicator size="small" color="#ff4444" style={styles.loader} />}
+            <TouchableOpacity style={styles.exitButton} onPress={handleExit}>
+              <Text style={styles.exitButtonText}>EXIT</Text>
+            </TouchableOpacity>
           </View>
         </View>
         <Terminal
@@ -80,5 +90,20 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginLeft: 8,
+  },
+  exitButton: {
+    marginLeft: 15,
+    backgroundColor: '#2a2a2a',
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  exitButtonText: {
+    color: '#ff4444',
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
   },
 });

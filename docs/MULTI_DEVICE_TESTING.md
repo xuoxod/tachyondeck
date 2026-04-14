@@ -2,42 +2,44 @@
 
 This guide walks you through deploying the zero-trust architecture across your cross-platform ecosystem (Mobile, Smart TVs, and Web).
 
-## 🚀 Step 1: Start the Backend (On your "Other Laptop")
+## 🚀 Step 1: Start the Backend (On your Target Server/Laptop)
 
-1. Open a terminal on the target computer and run:
+1. Open a terminal on the target edge node and run:
 
    ```bash
-   git clone https://github.com/xuoxod/tachyonflux.git
    cd tachyonflux
-   go run cmd/tachyon/main.go --turn wss://sfu.rmediatech.com/ws
+   go run cmd/tachyon/main.go
    ```
 
-   *(Note: Use `sfu.rmediatech.com` if `turn.rmediatech.com` has a certificate mismatch!)*
-2. Find out this laptop's local Wi-Fi IP address (e.g., `192.168.1.50`). You will need this for the mobile app to securely connect over your local area network.
+2. Make sure your server is securely communicating with the centralized `https://rmediatech.com/api/signal/tachyon` signaling REST API.
 
-## 💻 Step 2: Start the UI Bundler (On your Dev Laptop)
+## 💻 Step 2: Compile the Custom Dev Client (On your Dev Laptop)
 
-On your primary development machine, open your terminal and run:
+Because TachyonDeck utilizes true native WebRTC data channels, standard "Expo Go" is insufficient. 
 
-```bash
-cd /home/emhcet/private/projects/desktop/mobile/tachyondeck
-npm install --legacy-peer-deps
-npx expo start
-```
+1. On your primary development machine, open your terminal and run:
+   ```bash
+   cd /home/emhcet/private/projects/desktop/mobile/tachyondeck
+   npm install
+   eas build --profile development --platform android
+   ```
+   *(If deploying to iOS, change the platform to `ios`)*
+2. Wait for the EAS Cloud Build to finish. It will generate a QR Code.
 
-*A giant QR code will prominently appear in your terminal window.*
+## 🤳 Step 3: Install & Connect your Mobile Phone (iOS/Android)
 
-## 🤳 Step 3: Connect your Android Phone
-
-1. Connect your Android phone to the **exact same Wi-Fi network** as your Dev Laptop.
-2. Download the free **Expo Go** app from the Google Play Store.
-3. Open Expo Go, tap **Scan QR Code**, and point your camera at the QR code on your Dev Laptop.
-4. The JavaScript bundle will download over your LAN and the React Native UI will launch.
+1. Connect your smartphone to the **exact same Wi-Fi network** as your Dev Laptop.
+2. Open your phone's native **Camera app**, scan the EAS Build QR code from your terminal, and install the `.apk` or `.tar.gz` directly onto your phone.
+3. Once the app is installed, go back to your Dev Laptop and start the bundler explicitly targeting your new custom client:
+   ```bash
+   npx expo start --dev-client
+   ```
+4. A *new* QR code for the bundler will appear. Scan this *second* QR code with your phone's Camera app, and it will prompt you to open the **TachyonDeck** app you just installed. The JavaScript bundle will download over your LAN and the React Native UI will launch.
 
 ## 📺 Step 4: Connect the Google TV & Echo Show (Web Mode)
 
-1. Go back to the terminal on your Dev Laptop that is displaying the QR code, and firmly press the **`w`** key.
-2. Expo will instantly compile and bind a pristine Web URL (e.g., `http://192.168.1.XX:8081`).
+1. Go back to the terminal on your Dev Laptop that is displaying the `npx expo start` QR code, and press the **`w`** key.
+2. Expo will instantly compile and bind a pristine Web API URL (e.g., `http://192.168.1.XX:8081`).
 3. Open the **Silk Browser** on your Echo Show, and whatever native web browser you use on your **Google TV**, and enter that exact URL.
 
 *You are now monitoring your secure endpoints seamlessly across four different screens!*

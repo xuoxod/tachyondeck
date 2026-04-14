@@ -2,6 +2,7 @@
   "expo": {
     "name": "tachyondeck",
     "slug": "tachyondeck",
+    "scheme": "tachyondeck",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +22,16 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.tachyondeck"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f285fa6f-5bfa-498f-acfc-b7840472c6ca"
+      }
     }
   }
 }

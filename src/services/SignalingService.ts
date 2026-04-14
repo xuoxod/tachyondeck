@@ -1,16 +1,19 @@
 export class SignalingService {
   private url: string;
-  public ws: WebSocket | null = null;
-  private messageQueue: any[] = [];
   private listeners: Record<string, ((data: any) => void)[]> = {};
-  
-  private reconnectAttempts = 0;
-  private reconnectTimeout: any = null;
+
   private isIntentionallyClosed = false;
   private state: string = 'disconnected';
+  private sessionId: string;
+  private seq: number = 0;
+  private pollTimeout: any = null;
+
+  // Track message queue for failures, though less critical than WS
+  private messageQueue: any[] = [];
 
   constructor(url: string) {
     this.url = url;
+    this.sessionId = `tachyondeck-${Math.random().toString(36).substring(2, 10)}`;
   }
 
   public on(event: string, callback: (data: any) => void) {
@@ -36,82 +39,118 @@ export class SignalingService {
     this.emit('connectionStateChange', newState);
   }
 
-  connect() {
+  public async connect() {
     this.isIntentionallyClosed = false;
-    this.setState('connecting');
-    this.ws = new WebSocket(this.url);
+    this.seq = 0;
 
-    this.ws.onopen = () => {
-      this.reconnectAttempts = 0; // Reset backoff
-      this.setState('connected');
-      
-      // Flush queued messages
-      while (this.messageQueue.length > 0) {
-        const msg = this.messageQueue.shift();
-        this.ws?.send(JSON.stringify(msg));
+    try {
+      // Fast-forward past historical garbage before asserting 'connected'
+      const response = await fetch(this.url);
+      if (response.ok) {
+        const text = await response.text();
+        if (text) {
+          const parsed = JSON.parse(text);
+          if (parsed.maxSeq) {
+            this.seq = parsed.maxSeq;
+          }
+        }
       }
-    };
+    } catch (err) {
+      console.warn('Initial signaling sync failed', err);
+    }
 
-    this.ws.onmessage = (event: any) => {
-      try {
-        const parsed = JSON.parse(event.data);
-        this.emit('message', parsed);
-      } catch (err) {
-        // Discard malformed JSON gracefully rather than crashing the thread
-        console.warn('SignalingService: Dropped malformed msg', err);
-      }
-    };
-
-    this.ws.onclose = () => {
-      this.ws = null;
-      this.setState('disconnected');
-
-      if (!this.isIntentionallyClosed) {
-        this.scheduleReconnect();
-      }
-    };
-
-    this.ws.onerror = (error) => {
-      console.warn('SignalingService: WS Error', error);
-      // Error will often precede a close event, cleanup/reconnect happens in onclose
-    };
+    this.setState('connected');
+    this.poll();
   }
 
-  disconnect() {
-    this.isIntentionallyClosed = true;
-    if (this.reconnectTimeout) {
-      clearTimeout(this.reconnectTimeout);
-      this.reconnectTimeout = null;
+  private async poll() {
+    if (this.isIntentionallyClosed) return;
+
+    try {
+      const response = await fetch(`${this.url}?since=${this.seq}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const text = await response.text();
+      if (text) {
+        const parsed = JSON.parse(text);
+        const messages = Array.isArray(parsed) ? parsed : (parsed.messages || []);
+
+        if (Array.isArray(messages)) {
+          for (const msg of messages) {
+            if (msg.seq > this.seq) {
+              this.seq = msg.seq;
+            }
+
+            // Ignore own messages
+            if (msg.sessionId === this.sessionId) {
+              continue;
+            }
+
+            // Only push WebRTC types to the React Hook
+            if (['offer', 'answer', 'candidate'].includes(msg.type)) {
+              // Remap for the React hooks expectations
+              const forwardData = {
+                type: msg.type,
+                data: msg.data
+              };
+              this.emit('message', forwardData);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      // Quiet fail - backoff briefly
+      if (!this.isIntentionallyClosed) {
+        this.pollTimeout = setTimeout(() => this.poll(), 2000);
+        return;
+      }
     }
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
+
+    if (!this.isIntentionallyClosed) {
+      // Loop again (long polling block)
+      this.pollTimeout = setTimeout(() => this.poll(), 500);
+    }
+  }
+
+  public disconnect() {
+    this.isIntentionallyClosed = true;
+    if (this.pollTimeout) {
+      clearTimeout(this.pollTimeout);
+      this.pollTimeout = null;
     }
     this.setState('disconnected');
   }
 
-  sendMessage(payload: any) {
-    if (this.ws && this.ws.readyState === 1) { // 1 == OPEN
-      this.ws.send(JSON.stringify(payload));
-    } else if (this.ws && this.ws.readyState === 0) { // 0 == CONNECTING
+  public async sendMessage(payload: any) {
+    if (this.isIntentionallyClosed) {
       this.messageQueue.push(payload);
-    } else {
-      // Socket is closed or closing. Softly drop it.
-      console.warn('SignalingService: Msg dropped, socket closed.');
+      return;
     }
-  }
 
-  private scheduleReconnect() {
-    if (this.reconnectTimeout) return;
+    // Structure for rmediatech signaling router
+    const rmtMsg = {
+      type: payload.type || 'chat',
+      sessionId: this.sessionId,
+      data: payload.data || payload
+    };
 
-    // Exponential Backoff algorithm (Maxes out to prevent unbounded delays)
-    // Retry formula: 2^attempts * 1000ms. (1s, 2s, 4s, 8s, 16s... max 30s)
-    const delay = Math.min(Math.pow(2, this.reconnectAttempts) * 1000, 30000);
-    this.reconnectAttempts++;
+    try {
+      const response = await fetch(this.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(rmtMsg)
+      });
 
-    this.reconnectTimeout = setTimeout(() => {
-      this.reconnectTimeout = null;
-      this.connect();
-    }, delay);
+      if (!response.ok) {
+        console.warn('SignalingService: Send failed', response.status);
+      }
+    } catch (err) {
+      console.warn('SignalingService: Send exception', err);
+    }
   }
 }

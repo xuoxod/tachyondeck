@@ -1,25 +1,49 @@
 export class SignalingService {
   private url: string;
-  private ws: WebSocket | null = null;
+  public ws: WebSocket | null = null;
   private messageQueue: any[] = [];
-  private onStateChangeCb: ((connected: boolean) => void) | null = null;
-  private onMessageCb: ((msg: any) => void) | null = null;
+  private listeners: Record<string, ((data: any) => void)[]> = {};
   
   private reconnectAttempts = 0;
   private reconnectTimeout: any = null;
   private isIntentionallyClosed = false;
+  private state: string = 'disconnected';
 
   constructor(url: string) {
     this.url = url;
   }
 
+  public on(event: string, callback: (data: any) => void) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  }
+
+  public off(event: string, callback: (data: any) => void) {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+  }
+
+  private emit(event: string, data: any) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach(cb => cb(data));
+    }
+  }
+
+  private setState(newState: string) {
+    this.state = newState;
+    this.emit('connectionStateChange', newState);
+  }
+
   connect() {
     this.isIntentionallyClosed = false;
+    this.setState('connecting');
     this.ws = new WebSocket(this.url);
 
     this.ws.onopen = () => {
       this.reconnectAttempts = 0; // Reset backoff
-      if (this.onStateChangeCb) this.onStateChangeCb(true);
+      this.setState('connected');
       
       // Flush queued messages
       while (this.messageQueue.length > 0) {
@@ -31,7 +55,7 @@ export class SignalingService {
     this.ws.onmessage = (event: any) => {
       try {
         const parsed = JSON.parse(event.data);
-        if (this.onMessageCb) this.onMessageCb(parsed);
+        this.emit('message', parsed);
       } catch (err) {
         // Discard malformed JSON gracefully rather than crashing the thread
         console.warn('SignalingService: Dropped malformed msg', err);
@@ -40,7 +64,7 @@ export class SignalingService {
 
     this.ws.onclose = () => {
       this.ws = null;
-      if (this.onStateChangeCb) this.onStateChangeCb(false);
+      this.setState('disconnected');
 
       if (!this.isIntentionallyClosed) {
         this.scheduleReconnect();
@@ -63,28 +87,18 @@ export class SignalingService {
       this.ws.close();
       this.ws = null;
     }
-    if (this.onStateChangeCb) this.onStateChangeCb(false);
+    this.setState('disconnected');
   }
 
-  sendMessage(type: string, payload: any) {
-    const message = { type, payload };
-    
+  sendMessage(payload: any) {
     if (this.ws && this.ws.readyState === 1) { // 1 == OPEN
-      this.ws.send(JSON.stringify(message));
+      this.ws.send(JSON.stringify(payload));
     } else if (this.ws && this.ws.readyState === 0) { // 0 == CONNECTING
-      this.messageQueue.push(message);
+      this.messageQueue.push(payload);
     } else {
       // Socket is closed or closing. Softly drop it.
       console.warn('SignalingService: Msg dropped, socket closed.');
     }
-  }
-
-  onMessage(callback: (msg: any) => void) {
-    this.onMessageCb = callback;
-  }
-
-  onConnectionStateChange(callback: (connected: boolean) => void) {
-    this.onStateChangeCb = callback;
   }
 
   private scheduleReconnect() {

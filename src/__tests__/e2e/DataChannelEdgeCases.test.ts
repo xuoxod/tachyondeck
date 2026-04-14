@@ -36,60 +36,61 @@ describe('TachyonDeck Edge Case E2E (DataChannel Handling)', () => {
   });
 
   it('drops malformed payload strings seamlessly without OOM or App Crash', () => {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+
     // Simulate connection
     signaling.connect();
-    
+
     // Attempt sending a payload immediately that is not stringifiable (circular ref) or totally broken
     const obj: any = {};
     obj.self = obj;
 
     // The method should gracefully catch or reject
     try {
-        signaling.sendCommand('pty_exec', obj);
-    } catch(e) {
-        expect(e).toBeDefined();
+      signaling.sendMessage(obj);
+    } catch (e) {
+      expect(e).toBeDefined();
     }
 
     errorSpy.mockRestore();
   });
 
   it('correctly re-authenticates or triggers failure state on TURN server IP Drop (Network Loss)', () => {
-     // Mock the internal websockets to randomly close and verify reconnect attempts
-     expect(signaling).toBeDefined();
-     
-     signaling.connect();
-     // Trigger socket close code normally emitted when an airport wifi cuts out
-     // @ts-ignore
-     if (signaling.ws && signaling.ws.onclose) {
-        // @ts-ignore
-        signaling.ws.onclose({ code: 1006, reason: 'Abnormal Closure' });
-     }
+    // Mock the internal websockets to randomly close and verify reconnect attempts
+    expect(signaling).toBeDefined();
 
-     // State should reflect reconnecting or disconnected, waiting for exponential backoff tick
-     expect(signaling['state']).not.toBe('connected');
+    signaling.connect();
+    // Trigger socket close code normally emitted when an airport wifi cuts out
+    // @ts-ignore
+    if (signaling.ws && signaling.ws.onclose) {
+      // @ts-ignore
+      signaling.ws.onclose({ code: 1006, reason: 'Abnormal Closure' });
+    }
+
+    // State should reflect reconnecting or disconnected, waiting for exponential backoff tick
+    expect(signaling['state']).not.toBe('connected');
   });
 
   it('handles massive 10,000+ line terminal output without string parsing bottlenecks', async () => {
-     const massiveString = Array.from({ length: 10000 }, (_, i) => `Line ${i} system trace output standard ok`).join('\n');
-     
-     // Mock the DataChannel receiving this exact payload
-     const payload = JSON.stringify({
-         action: 'pty_exec',
-         success: true,
-         data: massiveString
-     });
+    const massiveString = Array.from({ length: 10000 }, (_, i) => `Line ${i} system trace output standard ok`).join('\n');
 
-     // Hook into the raw parser
-     let receivedLength = 0;
-     signaling.on('message', (msg) => {
-         receivedLength = msg.data.length;
-     });
+    // Mock the DataChannel receiving this exact payload
+    const payload = JSON.stringify({
+      action: 'pty_exec',
+      success: true,
+      data: massiveString
+    });
 
-     // @ts-ignore
-     signaling['handleDataChannelMessage']({ data: payload });
+    // Hook into the raw parser
+    signaling.connect();
+    let receivedLength = 0;
+    signaling.on('message', (msg) => {
+      receivedLength = msg.data.length;
+    });
 
-     expect(receivedLength).toBe(massiveString.length);
+    // @ts-ignore
+    if (signaling.ws && signaling.ws.onmessage) { signaling.ws.onmessage({ data: payload } as any); }
+
+    expect(receivedLength).toBe(massiveString.length);
   });
 });

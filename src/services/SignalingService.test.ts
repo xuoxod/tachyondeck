@@ -19,7 +19,7 @@ class MockWebSocket {
   }
 }
 
-global.WebSocket = MockWebSocket as any;
+(global as any).WebSocket = MockWebSocket as any;
 
 describe('SignalingService', () => {
   let service: SignalingService;
@@ -49,7 +49,7 @@ describe('SignalingService', () => {
   it('should emit connection state changes', () => {
     service = new SignalingService(testUrl);
     const mockStateChange = jest.fn();
-    service.onConnectionStateChange(mockStateChange);
+    service.on('connectionStateChange', mockStateChange);
     
     service.connect();
     const ws = (global as any).latestWebSocket;
@@ -58,11 +58,11 @@ describe('SignalingService', () => {
     ws.readyState = 1; // OPEN
     ws.onopen!();
     
-    expect(mockStateChange).toHaveBeenCalledWith(true);
+    expect(mockStateChange).toHaveBeenCalledWith('connected');
 
     // Simulate connection close
     ws.onclose!({});
-    expect(mockStateChange).toHaveBeenCalledWith(false);
+    expect(mockStateChange).toHaveBeenCalledWith('disconnected');
   });
 
   it('should successfully send JSON formatted messages when connected', () => {
@@ -73,7 +73,7 @@ describe('SignalingService', () => {
     ws.readyState = 1; // OPEN
     ws.onopen!();
 
-    service.sendMessage('sdp_offer', { sdp: 'fake-sdp-data' });
+    service.sendMessage({ type: 'sdp_offer', payload: { sdp: 'fake-sdp-data' } });
     
     expect(ws.send).toHaveBeenCalledWith(JSON.stringify({
       type: 'sdp_offer',
@@ -88,7 +88,7 @@ describe('SignalingService', () => {
     const ws = (global as any).latestWebSocket;
     
     // Sent while readyState = 0 (CONNECTING)
-    service.sendMessage('ice_candidate', { candidate: 'fake-candidate' });
+    service.sendMessage({ type: 'ice_candidate', payload: { candidate: 'fake-candidate' } });
     expect(ws.send).not.toHaveBeenCalled();
 
     // Trigger open
@@ -112,7 +112,7 @@ describe('SignalingService', () => {
     
     // Attempt sending
     expect(() => {
-      service.sendMessage('ping', {});
+      service.sendMessage({ type: 'ping', payload: {} });
     }).not.toThrow();
   });
 
@@ -121,7 +121,7 @@ describe('SignalingService', () => {
     service.connect();
 
     const mockMessageHandler = jest.fn();
-    service.onMessage(mockMessageHandler);
+    service.on('message', mockMessageHandler);
 
     const ws = (global as any).latestWebSocket;
     ws.readyState = 1;
@@ -140,7 +140,7 @@ describe('SignalingService', () => {
     service.connect();
 
     const mockMessageHandler = jest.fn();
-    service.onMessage(mockMessageHandler);
+    service.on('message', mockMessageHandler);
 
     const ws = (global as any).latestWebSocket;
     

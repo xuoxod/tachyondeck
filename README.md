@@ -68,7 +68,34 @@ npm run test
 ```
 
 ---
+## 📱 Multi-Device Testing Guide (Frontend Setup)
 
+Want to see the app run on your cell phone, Google TV, and Echo Show all at the same time? You do **not** need app store approvals or developer accounts! 
+
+*(Make sure your backend is running first. See the [TachyonFlux README](https://github.com/xuoxod/tachyonflux) for that quick step!)*
+
+**2. Start the UI (On your Dev Laptop)**
+1. Open a terminal in this `tachyondeck` project folder.
+2. Run these commands to start the React Native bundler:
+   ```bash
+   npm install
+   npx expo start
+   ```
+3. A giant QR code will appear in your terminal!
+
+**3. Test on your Android Phone**
+1. Download the free **Expo Go** app from the Google Play Store on your phone. 
+2. Open the Expo Go app and tap "Scan QR Code".
+3. Point your camera at the terminal on your dev laptop. The app will instantly download over your Wi-Fi and run natively on your phone!
+
+**4. Test on the Echo Show & Google TV (Web Mode)**
+1. In the same terminal where the QR code is showing, press the **`w`** key on your keyboard. This tells Expo to bundle a Web version of your app.
+2. Look for the web URL it prints out (usually something like `http://192.168.1.XX:8081`).
+3. Open the **Silk Browser** on your Echo Show, or the web browser on your Google TV, and type in that exact URL. 
+
+*Presto! You are now controlling your backend from 3 different smart devices at once!*
+
+---
 ## �🤝 Open Source Best Practices
 
 - **Strict CI Pipeline:** This repository follows a strict TDD methodology. Always run your local test suites before submitting Pull Requests.

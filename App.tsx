@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Terminal } from './src/components/Terminal';
 import { useTachyon } from './src/hooks/useTachyon';
 
-const TACHYONFLUX_WS_URL = 'ws://192.168.1.100:8080/terminal'; // Replace with a local IP in real app
+const TACHYONFLUX_WS_URL = 'ws://192.168.1.158:8080/terminal'; // e.g. ws://192.168.1.50:8080/terminal
 
 export default function App() {
   const {
@@ -20,21 +21,23 @@ export default function App() {
   }, [connect, disconnect]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>tachyondeck</Text>
-        <View style={styles.statusContainer}>
-          <Text style={[styles.statusText, isConnected ? styles.connected : styles.disconnected]}>
-            {isConnected ? 'ONLINE' : 'OFFLINE'}
-          </Text>
-          {!isConnected && <ActivityIndicator size="small" color="#ff4444" style={styles.loader} />}
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>tachyondeck</Text>
+          <View style={styles.statusContainer}>
+            <Text style={[styles.statusText, isConnected ? styles.connected : styles.disconnected]}>
+              {isConnected ? 'ONLINE' : 'OFFLINE'}
+            </Text>
+            {!isConnected && <ActivityIndicator size="small" color="#ff4444" style={styles.loader} />}
+          </View>
         </View>
+        <Terminal
+          output={output}
+          onCommandSubmit={sendCommand}
+        />
       </View>
-      <Terminal
-        output={output}
-        onCommandSubmit={sendCommand}
-      />
-    </View>
+    </SafeAreaProvider>
   );
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, TextInput, Text, FlatList, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TerminalProps {
   output: string[];
@@ -9,6 +10,7 @@ interface TerminalProps {
 export const Terminal: React.FC<TerminalProps> = ({ output, onCommandSubmit }) => {
   const [inputVal, setInputVal] = useState('');
   const flatListRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
 
   const handleSubmit = () => {
     const trimmed = inputVal.trim();
@@ -43,8 +45,8 @@ export const Terminal: React.FC<TerminalProps> = ({ output, onCommandSubmit }) =
           maxToRenderPerBatch={50}
           windowSize={10}
         />
-        
-        <View style={styles.inputContainer}>
+
+        <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 10 }]}>
           <Text style={styles.promptText}>$ </Text>
           <TextInput
             testID="terminal-input"
@@ -91,7 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: '#333',
     backgroundColor: '#111',

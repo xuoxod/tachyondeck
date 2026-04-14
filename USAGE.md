@@ -1,54 +1,82 @@
-# TachyonDeck: Step-by-Step Usage Guide
+# TachyonDeck: Mobile Usage Guide
 
-This guide will take you from starting `TachyonDeck` on your mobile device to securely executing your first proxied request to your private network.
+Welcome to the **TachyonDeck** Usage Guide! This guide is designed to help you quickly set up your secure mobile tunnel. **TachyonDeck** is the companion app to your remote computer (which runs the `TachyonFlux` edge node). 
 
----
-
-## Step 1: Getting the App
-
-You have two ways to execute TachyonDeck on your mobile device:
-
-### Option A: The Direct Web App (PWA)
-1. Open your phone's web browser and go to **[rmediatech.com/tachyon](https://rmediatech.com/tachyon)**.
-2. Scroll to the **TachyonDeck** card and tap the **"Launch PWA directly"** button. This opens the deck interface immediately.
-3. *Optional:* You can use the "Add to Home Screen" option in iOS Safari or Google Chrome to treat it as a native app instance.
-
-### Option B: The Native App
-* **Android:** Tap the "Play Store" button to download from the Google Play Store.
-* **iOS:** Tap the "App Store" button for the iOS build.
+Using TachyonDeck allows you to securely send commands, view private files, or control smart home devices directly from your iOS or Android phone without opening any dangerous ports on your router.
 
 ---
 
-## Step 2: The Mobile Handshake
+## 📱 Phase 1: Getting the App on Your Phone
 
-Now that your app is open, you need to connect to an edge node (a machine running `tachyonflux`):
-1. **Authenticate:** Log in using your standard RMediaTech account credentials inside the TachyonDeck app. 
-2. **Navigate to Edge Nodes:** The `rmediatech` signaling server automatically links your authenticated account to any running `tachyonflux` instances associated with you.
-3. **Establish Tunnel:** Tap **Connect** next to your active node. 
-4. The app negotiates an end-to-end encrypted WebRTC DataChannel directly to your edge machine. The cloud infrastructure steps out of the loop completely.
+You can launch TachyonDeck using the quick web version, or install it as a fully native application. 
+
+### Option A: The Instant Web App (No Install Required)
+
+The fastest way to test your secure tunnel is directly through your mobile browser.
+
+1. Open **Safari** (on iPhone) or **Chrome** (on Android).
+2. Type in: `https://rmediatech.com/tachyon`
+3. Tap **Launch Secure Deck**.
+4. *(Optional but Highly Recommended):* Tap your browser's "Share" button and select **Add to Home Screen**. This lets it operate perfectly as a standalone, full-screen mobile app!
+
+### Option B: The Native App (coming soon)
+
+* **Android:** Tap the "Play Store" button to download it directly.
+* **iOS:** Tap the "App Store" button to download.
 
 ---
 
-## Step 3: Executing Commands (Examples)
+## 🤝 Phase 2: Securely Pairing with Your Server
 
-Once connected, your phone has a direct, encrypted pipeline to the machine running `tachyonflux`, no matter what networks you are on.
+Before we control anything, we need to introduce your phone to your remote computer.
 
-### Example A: Remote Terminal Execution
-Need to restart a docker container on your server while away from your laptop?
-1. Open the **Terminal** view in TachyonDeck.
-2. Type your bash command: `docker restart my_web_app`
-3. Hit Send. The command is run securely by `tachyonflux` locally, and the stdout streams directly to your mobile screen.
+1. Open the **TachyonDeck** app on your phone.
+2. Log in using your secure credentials.
+3. Once logged in, tap on the **Connect** button in the center dashboard.
+4. Your phone will reach out and silently handshake with your remote `TachyonFlux` node. 
+5. When the status indicator turns **Green**, your end-to-end encrypted WebRTC tunnel is locked in.
 
-### Example B: Proxied HTTP Request (Internal Webcams / IoT)
-Suppose you have a webcam or a local admin dashboard at `http://192.168.1.50:80` on your home network, which is safely blocked from the public internet.
-1. Open the **Network Proxy** view in TachyonDeck.
-2. Enter the exact target local URL: `http://192.168.1.50`
-3. Set Method: `GET`
-4. Send the request. `tachyonflux` safely fetches the internal network page and returns the stream through the robust WebRTC tunnel.
+---
 
-### Example C: Home Assistant Webhook
-Suppose your Home Assistant is running on `127.0.0.1:8123` on the same machine as `flux`.
-1. Navigate to the **Macros** manager.
-2. Set the target HTTP endpoint: `http://127.0.0.1:8123/api/webhook/secret_hook`
-3. Set Method: `POST`, and define a JSON body/payload if necessary.
-4. Save the Macro. Whenever you tap that macro button, you securely trigger an internal smart-home automation. No port forwarding required.
+## 🛠️ Phase 3: Actionable Mobile Scenarios
+
+Now that your phone is securely married to your remote computer, here is exactly how to manage things with just a few taps.
+
+### Scenario 1: Restarting a Broken Docker Container
+
+*Goal: A service crashed on your cloud server. You are at an airport with only your phone and need to quickly restart the service.*
+
+1. Tap the **Terminal Dashboard** icon.
+2. In the `Command` input, type: `docker`
+3. In the `Arguments` input, type: `restart my_web_app`
+4. Tap the **Execute** button.
+
+*Result:* The encrypted command flies straight to your server, restarts the application securely, and streams the success output right back to your mobile screen.
+
+### Scenario 2: Controlling an Internal Smart-Home Device
+
+*Goal: You want to trigger an internal home automation, like opening a garage door managed by Home Assistant (`http://192.168.1.150:8123`), but you haven't exposed your home to the internet.*
+
+1. Tap the **Network Proxy** icon.
+2. Change the method selector to `POST`.
+3. Set the private target URL to: `http://192.168.1.150:8123/api/webhook/open_garage`
+4. Tap **Send Secure Payload**.
+
+*Result:* TachyonDeck uses your remote computer as a secure bridge, successfully executing the command on your local Wi-Fi without you physically being there.
+
+### Scenario 3: Checking Secure Log Files
+
+*Goal: Your computer is acting funny, and you want to read a specific protected log file deeply buried on the machine.*
+
+1. Tap the **File Explorer** icon.
+2. Simply type the absolute path you wish to view. Example: `/var/log/syslog`
+3. Tap **Fetch Securely**.
+
+*Result:* The file contents are grabbed and displayed natively inside your app's code-viewer window for fast, lag-free scrolling.
+
+---
+
+## 🔒 Your Privacy First
+
+- **End-to-End Encrypted:** Not even the middle-man servers can see your passwords or terminal output. 
+- **Zero-Ingress Setup:** Hackers can't "attack" your TachyonDeck connection because it never opens listening ports on the web. It uses modern WebRTC peer-to-peer tunneling!

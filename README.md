@@ -12,7 +12,7 @@
 
 ## 📖 Overview
 
-**TachyonDeck** is the sleek, mobile-exclusive counterpart to the headless [TachyonFlux](https://github.com/xuoxod/tachyonflux) edge node. 
+**TachyonDeck** is the sleek, mobile-exclusive counterpart to the headless [TachyonFlux](https://github.com/xuoxod/tachyonflux) edge node.
 
 Instead of dealing with clunky mobile SSH clients or complicated VPNs, TachyonDeck establishes a direct, end-to-end encrypted peer connection right to your remote servers and smart homes. It gives you an elegant, lag-free management dashboard right natively on your iOS, Android, or Web device.
 
@@ -53,11 +53,23 @@ npm install --legacy-peer-deps
 npx expo start
 ```
 
-2. Scan the generated QR code using your physical device's camera (iOS) or the Expo Go app (Android) to load the UI straight to your screen!
+1. Scan the generated QR code using your physical device's camera (iOS) or the Expo Go app (Android) to load the UI straight to your screen!
 
 ---
 
-## 🤝 Open Source Best Practices
+## � Running the Test Suite
+
+TachyonDeck is built with a deep emphasis on Test-Driven Development (TDD). We simulate an entire raw WebSocket Network Server and WebRTC DataChannel lifecycle to test Edge Cases (like malformed JSON and connection drops) entirely headless inside Node.js.
+
+To run the Jest test suite:
+
+```bash
+npm run test
+```
+
+---
+
+## �🤝 Open Source Best Practices
 
 - **Strict CI Pipeline:** This repository follows a strict TDD methodology. Always run your local test suites before submitting Pull Requests.
 - **Clean Architecture:** Our UI components (views) are completely decoupled from our headless WebSocket drivers (`SignalingService.ts`), allowing fast UI iterations without breaking the secure tunnel logic.

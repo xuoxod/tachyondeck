@@ -1,102 +1,94 @@
 # 🌌 TachyonDeck
 
-## The Mobile Command Center for Zero-Trust Infrastructure
+## The Command Center for Zero-Trust Infrastructure
 
-*A beautiful, lightning-fast cross-platform terminal interface securely bridging WebRTC edges to your pocket.*
+*A beautiful, lightning-fast cross-platform interface securely bridging edge nodes to your pocket.*
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
 
 ---
 
 ## 📖 Overview
 
-**TachyonDeck** is the sleek, mobile-exclusive counterpart to the headless [TachyonFlux](https://github.com/xuoxod/tachyonflux) edge node.
+**TachyonDeck** is the sleek, universally adaptable counterpart to the headless [TachyonFlux](https://github.com/xuoxod/tachyonflux) edge node.
 
-Instead of dealing with clunky mobile SSH clients or complicated VPNs, TachyonDeck establishes a direct, end-to-end encrypted peer connection right to your remote servers and smart homes. It gives you an elegant, lag-free management dashboard right natively on your iOS, Android, or Web device.
+Instead of dealing with clunky mobile terminal clients or complicated VPN configuration files, TachyonDeck establishes a direct, end-to-end encrypted connection right to your private servers. It provides an elegant, highly responsive management dashboard natively on your phone, tablet, or smart display.
 
 ---
 
 ## ⚡ Core Features
 
-- **🚀 Highly Performant Terminal UI:** Leverages deeply optimized list virtualization to handle thousands of lines of rapid terminal logs without stuttering.
-- **🔒 True NAT Traversal:** Connects straight to your edge nodes without opening router ports via strict WebRTC tunneling.
-- **📱 True Cross-Platform:** Built natively using React Native. Compile flawlessly to iOS, Android, and Web PWA via Expo.
-- **🛠️ Zero-Trust Design:** Never exposes your infrastructure IP addresses to the public internet.
+- **🚀 Highly Performant Interface:** Leverages deeply optimized rendering to handle thousands of lines of rapid terminal logs gracefully, without stuttering.
+- **🔒 True NAT Traversal:** Connects straight to your edge nodes without opening router ports via strict, secure data tunneling.
+- **📱 Universally Platform-Agnostic:** Code once, run everywhere. Designed to compile flawlessly to iOS, Android, and modern Web browsers.
+- **🛠️ Zero-Trust Design:** Operates without exposing your infrastructure IP addresses to the public internet, dramatically reducing your attack surface against automated threats.
 
 ---
 
-## 📚 Official Guides & Documentation
+## 💻 System Requirements
 
-- [**TachyonDeck Mobile Usage Guide**](https://github.com/xuoxod/tachyondeck/blob/main/USAGE.md) - Step-by-step instructions for securely controlling your servers from your phone.
-- [**Architectural Documentation**](https://github.com/xuoxod/tachyondeck/tree/main/docs) - A deeper look at how the app performs headless DataChannel operations underneath the UI.
-- [**The TachyonFlux Edge Node**](https://github.com/xuoxod/tachyonflux) - Head to the main zero-trust tunnel agent repository to see how the other half of the magic works!
+TachyonDeck is built to be tested and deployed quickly across any modern ecosystem.
+
+* **Development Environment:** Requires a standard Node.js environment (v18+) to run the bundler.
+* **Mobile Testing:** We highly recommend the free **Expo Go** application (available on iOS and Android app stores) for immediate, over-the-air native device testing.
+* **Web Testing:** Any modern browser (such as those running on a standard laptop, Google TV, or smart displays like the Echo Show).
 
 ---
 
-## 🛠️ Developer Quickstart
+## 📚 Usage Scenarios
 
-To run the open-source version locally:
+TachyonDeck is perfect for seamless, multi-screen remote infrastructure management:
 
-1. Ensure you have Node.js 18+ and `npm` installed. We highly recommend downloading the **Expo Go** app on your physical mobile device for immediate testing!
+* **Scenario A: On-the-Go Phone Access**
+  While commuting, open the TachyonDeck app on your smartphone to securely remote into your home office. Instantly check server health, restart failed services, or securely read logs right from the palm of your hand.
+* **Scenario B: The Smart Display Dashboard**
+  Launch the Web version of TachyonDeck through the built-in browser on an Echo Show or Google TV. Transform a device normally reserved for entertainment into a sleek, real-time monitoring dashboard for your internal network's health.
+* **Scenario C: Desktop Operations**
+  Run the dashboard simultaneously on a secondary laptop browser, giving yourself a beautifully formatted visual command center without installing heavy, specialized desktop clients.
 
+---
+
+## 🛠️ Step-by-Step Quickstart (Multi-Device Setup)
+
+Want to see the app run on your cell phone, Google TV, and desktop simultaneously? You do **not** need App Store approvals or complex developer accounts! 
+
+*(Make sure your TachyonFlux backend node is running on your network first. See the [TachyonFlux README](https://github.com/xuoxod/tachyonflux) for that quick step).*
+
+**Step 1: Start the UI Bundler (On your Dev Laptop)**
+Open a terminal in the `tachyondeck` project directory and start the local environment:
 ```bash
-# 1. Clone & Enter Directory
-git clone https://github.com/xuoxod/tachyondeck.git
-cd tachyondeck
-
-# 2. Install Dependencies
 npm install --legacy-peer-deps
-
-# 3. Launch the Bundler
 npx expo start
 ```
+*A distinct QR code will immediately appear in your terminal window.*
 
-1. Scan the generated QR code using your physical device's camera (iOS) or the Expo Go app (Android) to load the UI straight to your screen!
+**Step 2: Connect via Smartphone (iOS or Android)**
+1. Download the free **Expo Go** app from your platform's app store.
+2. Open Expo Go and tap the "Scan QR Code" option.
+3. Point your camera at the terminal on your development laptop. The application will instantly synchronize over your Wi-Fi and resolve natively on your phone screen!
+
+**Step 3: Connect via Smart TV or Smart Display (Web Mode)**
+1. In the same terminal where the QR code is displayed, press the **`w`** key on your keyboard. This instructs the bundler to compile a universal Web version of your app.
+2. Locate the web URL printed on the screen (usually resembling `http://192.168.1.XX:8081`).
+3. Open the built-in browser on your Google TV, secondary laptop, or Echo Show, and type in that exact URL. 
+
+*Presto! You are now securely managing your infrastructure from multiple physical screens at once.*
 
 ---
 
-## � Running the Test Suite
+## 🧪 Running the Test Suite
 
-TachyonDeck is built with a deep emphasis on Test-Driven Development (TDD). We simulate an entire raw WebSocket Network Server and WebRTC DataChannel lifecycle to test Edge Cases (like malformed JSON and connection drops) entirely headless inside Node.js.
+TachyonDeck is built with an unwavering emphasis on Test-Driven Development (TDD). The internal test suite meticulously simulates network lifecycles and edge cases (like malformed data drops) completely headless.
 
-To run the Jest test suite:
-
+To execute the test suite:
 ```bash
 npm run test
 ```
 
 ---
-## 📱 Multi-Device Testing Guide (Frontend Setup)
 
-Want to see the app run on your cell phone, Google TV, and Echo Show all at the same time? You do **not** need app store approvals or developer accounts! 
+## 🤝 Open Source Best Practices
 
-*(Make sure your backend is running first. See the [TachyonFlux README](https://github.com/xuoxod/tachyonflux) for that quick step!)*
-
-**2. Start the UI (On your Dev Laptop)**
-1. Open a terminal in this `tachyondeck` project folder.
-2. Run these commands to start the React Native bundler:
-   ```bash
-   npm install
-   npx expo start
-   ```
-3. A giant QR code will appear in your terminal!
-
-**3. Test on your Android Phone**
-1. Download the free **Expo Go** app from the Google Play Store on your phone. 
-2. Open the Expo Go app and tap "Scan QR Code".
-3. Point your camera at the terminal on your dev laptop. The app will instantly download over your Wi-Fi and run natively on your phone!
-
-**4. Test on the Echo Show & Google TV (Web Mode)**
-1. In the same terminal where the QR code is showing, press the **`w`** key on your keyboard. This tells Expo to bundle a Web version of your app.
-2. Look for the web URL it prints out (usually something like `http://192.168.1.XX:8081`).
-3. Open the **Silk Browser** on your Echo Show, or the web browser on your Google TV, and type in that exact URL. 
-
-*Presto! You are now controlling your backend from 3 different smart devices at once!*
-
----
-## �🤝 Open Source Best Practices
-
-- **Strict CI Pipeline:** This repository follows a strict TDD methodology. Always run your local test suites before submitting Pull Requests.
-- **Clean Architecture:** Our UI components (views) are completely decoupled from our headless WebSocket drivers (`SignalingService.ts`), allowing fast UI iterations without breaking the secure tunnel logic.
+- **Strict Validation:** Always run the local test suites to ensure edge-node architectural safety before submitting updates.
+- **Clean Architecture:** Interface modules are elegantly uncoupled from the under-the-hood encryption drivers, allowing for continuous UI evolution without risking tunnel stability.
